@@ -101,6 +101,9 @@ class SagemakerEndpoint(LLM):
     """
     client: Any  #: :meta private:
 
+    aws_access_key_id: str
+    aws_secret_access_key: str
+    
     endpoint_name: str = ""
     """The name of the endpoint from the deployed Sagemaker model.
     Must be unique within an AWS Region."""
@@ -164,12 +167,15 @@ class SagemakerEndpoint(LLM):
             try:
                 if values["credentials_profile_name"] is not None:
                     session = boto3.Session(
-                        profile_name=values["credentials_profile_name"]
+                        aws_access_key_id=values["aws_access_key_id"],
+                        aws_secret_access_key=values["aws_secret_access_key"]
                     )
                 else:
                     # use default credentials
-                    session = boto3.Session()
-
+                    session = boto3.Session(
+                        aws_access_key_id=values["aws_access_key_id"],
+                        aws_secret_access_key=values["aws_secret_access_key"]
+                    )
                 values["client"] = session.client(
                     "sagemaker-runtime", region_name=values["region_name"]
                 )
